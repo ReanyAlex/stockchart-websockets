@@ -89,5 +89,4 @@ io.on('connection', function(socket){
 
     io.sockets.emit('delete', data);
   })
-
 })

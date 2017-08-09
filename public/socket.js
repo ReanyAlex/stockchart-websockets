@@ -1,5 +1,5 @@
 //Make connection
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect('https://mysterious-waters-64686.herokuapp.com/');
 let symbol = document.getElementById('symbol')
 //emit event
 document.getElementById('search').addEventListener('click', function(){
