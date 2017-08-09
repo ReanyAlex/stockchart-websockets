@@ -8,19 +8,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
   </head>
   <body onload="displayLineChart();">
+
   <div>
     <input id="symbol" type="text" name="symbol" value="" placeholder="search for symbol">
     <input id="search" type="submit">
   </div>
+
   <div id="delete">
     <% stocks.forEach(function(stock,i){ %>
-      <div  class="box">
-        <div  ><%= stock["Meta Data"]["2. Symbol"].toUpperCase(); %></div>
-        Current Price: $<%= parseInt(stock["Time Series (Daily)"][Object.keys(stocks[0]["Time Series (Daily)"])[0]]["4. close"]) %> 
+      <div class="box">
+        <div  ><%= stock["Meta Data"]["2. Symbol"].toUpperCase() %></div>
+        Current Price: $<%= stock["Time Series (Daily)"][Object.keys(stock["Time Series (Daily)"])[0]]["4. close"]       %>
+        <br />
         <button onclick='test("<%= database[i]._id%>")' type="submit">Delete</button>
       </div>
     <% }) %>
   </div>
+
   <canvas id="lineChart" height="450" width="1200"></canvas>
 
   <script src="/socket.js"></script>
@@ -29,6 +33,7 @@
 
 <script language="JavaScript">
   let stocks = <%- JSON.stringify(stocks); %>
+  console.log(stocks);
   let dayArray = <%- JSON.stringify(Object.keys(stocks[0]["Time Series (Daily)"]).reverse()) %>
 
   let datasets = []

@@ -43,6 +43,9 @@ app.get('/', function(req, res) {
         .then(function(json) {
           return json
         })
+        .catch(function(err) {
+          console.log(err);
+        })
       })
 
       Promise.all(fetchArrayVars)
@@ -50,8 +53,9 @@ app.get('/', function(req, res) {
         return values
       })
       .then(function(values) {
-        res.render('index', {stocks: values, database: allStocks})
+          res.render('index', {stocks: values, database: allStocks})
       })
+
     }
   })
 });
@@ -67,20 +71,40 @@ io.on('connection', function(socket){
   console.log('made socket connection');
 
   socket.on('add',function(data) {
-    console.log('socket on emit',data.stockSymbol);
+    console.log('data',data.stockSymbol);
 
-    Stocks.create({stockSymbols:data.stockSymbol}, function(err) {
-      if (err) {
-        console.log(err);
+    let apiKey = 'K6MXIRAG7LP9MUAM'
+    let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${data.stockSymbol}&apikey=${apiKey}`
+
+    fetch(url)
+    .then((res) => res.json())
+    .then(function(json) {
+      console.log(json);
+      if (json['Error Message']) {
+        console.log('fail');
+        return
       }
+
+        console.log('pass');
+      Stocks.create({stockSymbols:data.stockSymbol}, function(err) {
+        if (err) {
+          console.log(err);
+        }
+      })
+
     })
+    .catch(function(err) {
+      console.log(err);
+    })
+
+
+
+
 
     io.sockets.emit('add', data);
   })
 
   socket.on('delete',function(data) {
-    console.log('socket on emit delete_id',data.delete);
-
     Stocks.findByIdAndRemove(data.delete, function(err) {
       if (err) {
         console.log(err);
