@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Stock Chart</title>
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+  </head>
+  <body onload="displayLineChart();">
+  <div>
+    <input id="symbol" type="text" name="symbol" value="" placeholder="search for symbol">
+    <input id="search" type="submit">
+  </div>
+  <div id="delete">
+    <% stocks.forEach(function(stock,i){ %>
+      <div  class="box">
+        <div  ><%= stock["Meta Data"]["2. Symbol"].toUpperCase(); %></div>
+        Current Price: $<%= parseInt(stock["Time Series (Daily)"][Object.keys(stocks[0]["Time Series (Daily)"])[0]]["4. close"]) %> 
+        <button onclick='test("<%= database[i]._id%>")' type="submit">Delete</button>
+      </div>
+    <% }) %>
+  </div>
+  <canvas id="lineChart" height="450" width="1200"></canvas>
+
+  <script src="/socket.js"></script>
+</body>
+</html>
+
+<script language="JavaScript">
+  let stocks = <%- JSON.stringify(stocks); %>
+  let dayArray = <%- JSON.stringify(Object.keys(stocks[0]["Time Series (Daily)"]).reverse()) %>
+
+  let datasets = []
+  let colors = ["red", "green", "blue", "purple", "orange", "brown", "cyan", "deeppink", "gold", "yellowgreen"]
+
+  stocks.forEach(function(stock,i) {
+  let closingValue = []
+  for (var j = 0; j < dayArray.length; j++) {
+    if (stock["Time Series (Daily)"][dayArray[j]] === undefined) {
+        closingValue.push("")
+    }else {
+      closingValue.push(stock["Time Series (Daily)"][dayArray[j]]["4. close"])
+    }
+  }
+
+  datasets.push({
+      label: stock["Meta Data"]["2. Symbol"].toUpperCase(),
+      backgroundColor: colors[i],
+      borderColor: colors[i],
+      fill: false,
+      borderWidth: 3,
+      pointBackgroundColor: "white",
+      pointRadius: 1,
+      data: closingValue,
+  })
+})
+
+  function displayLineChart() {
+    var data = {
+        labels: dayArray,
+        datasets: datasets
+    };
+
+    var ctx = document.getElementById("lineChart").getContext("2d");
+
+    var options = {}
+
+    var myLineChart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: options
+    });
+  }
+</script>
