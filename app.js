@@ -53,7 +53,21 @@ app.get('/', function(req, res) {
         return values
       })
       .then(function(values) {
-          res.render('index', {stocks: values, database: allStocks})
+        let url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=aapl&apikey=${apiKey}`
+
+          if (values.length === 0) {
+            fetch(url)
+            .then((res) => res.json())
+            .then(function(json) {
+              res.render('index', {stocks: [json], database: [{_id:1}]})
+            })
+            .catch(function(err) {
+              console.log(err);
+            })
+          } else {
+            res.render('index', {stocks: values, database: allStocks})
+          }
+
       })
 
     }
